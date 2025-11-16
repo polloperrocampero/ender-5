@@ -1,0 +1,365 @@
+#22# This file contains pin mappings for the Creality Ender 5 Plus.
+# Ender 5 Plus stock uses a Creality v2.2 board, similar to CR-20 Pro.
+# To use this config, the firmware should be compiled for the AVR
+# atmega2560.
+
+# See docs/Config_Reference.md for a description of parameters.
+
+[include RatOS/homing.cfg]
+[include RatOS/homing.cfg]
+[include RatOS/macros.cfg]
+[include RatOS/shell-macros.cfg]
+[include RatOS/printers/prusa-mk3s/macros.cfg]
+[include macros-cm3d.cfg]
+[include RatOS/homing.cfg]
+[include K-ShakeTune/*.cfg]
+
+
+
+#[mcu btt_adxl345]
+#serial: /dev/serial/by-id/usb-Klipper_rp2040_454741505A8663FA-if00
+
+
+#[adxl345]
+#cs_pin: btt_adxl345:gpio9
+#spi_bus: spi1a
+#spi_software_sclk_pin: btt_adxl345:gpio10
+#spi_software_mosi_pin: btt_adxl345:gpio11
+#spi_software_miso_pin: btt_adxl345:gpio8
+#axes_map: z,-x,y  # x,y,z       y z, x  -x,-y,-z
+
+
+#[resonance_tester]
+#probe_points: 100, 100, 20
+#accel_chip: adxl345
+
+
+
+
+#############################################################################################################
+### MACRO CONFIGURATION
+### Configure the behavior of RatOS macros
+#############################################################################################################
+[gcode_macro RatOS]
+# Use absolute extrusion mode
+# Set to True to use relative extrusion mode
+variable_relative_extrusion: True
+# Wait for extruder to reach 150 so an inductive probe (if present) is at a predictable temp. 
+# Also allows the bed heat to spread a little, and softens any plastic that might be stuck to the nozzle.
+# Set to False to disable
+variable_preheat_extruder: True
+# Calibrate the bed mesh in the START_PRINT macro.
+# Set to false to skip BED_MESH_CALIBRATE, it will still load the BED_MESH 
+# with the name "ratos", be sure to save your bed_mesh profile with that name.
+# or override the _START_PRINT_BED_MESH macro to implement your own mesh handling logic.
+variable_calibrate_bed_mesh: True
+variable_adaptive_mesh: True
+# Print a prime line at the end of the START_PRINT macro
+# set to False to disable nozzle_priming.
+variable_nozzle_priming: "primeline"
+# Park in the back when waiting for the extruder to heat up
+# set to "front" to park in the front, or "center" to park in the center.
+variable_start_print_park_in: "front"
+# Height to park it when waiting for extruder to heat.
+variable_start_print_park_z_height: 50
+# Skew profile to load before starting the print 
+# uncomment this to use your calibrated skew correction profile.
+#variable_skew_profile: "my_skew_profile"
+# Park in the back after the print has ended or was cancelled.
+# set to "front" to park in the front, or "center" to park in the center.
+variable_end_print_park_in: "back"
+# Park in the back when the print is paused.
+# set to "front" to park in the front, or "center" to park in the center.
+variable_pause_print_park_in: "front"
+# Set the speed for travel moves in RatOS Macros in mm/s.
+variable_macro_travel_speed: 100
+# Set the length and speed for the unload filament
+variable_filament_unload_length: 50
+variable_filament_unload_speed: 5
+# Set the length and speed for the load filament
+variable_filament_load_length: 50
+variable_filament_load_speed: 10
+variable_driver_type_x: "tmc2209"
+variable_driver_type_y: "tmc2209"
+# Possible values: 'sensorless' or 'endstops'.
+variable_homing: "sensorless"
+variable_sensorless_x_current: 0.5
+variable_sensorless_y_current: 0.5
+
+
+
+
+
+
+[heater_fan hotend]
+pin: P2.6
+heater_temp: 50.0
+
+[fan]
+pin: P2.4
+
+
+
+[stepper_x]
+step_pin: P2.2
+dir_pin: !P2.3
+enable_pin: !P2.1
+microsteps: 16
+rotation_distance: 40
+endstop_pin: tmc2209_stepper_x:virtual_endstop
+position_min: -5
+position_endstop: 350
+position_max: 350
+homing_speed: 20
+homing_retract_dist: 0 
+
+[tmc2209 stepper_x]
+uart_pin: P1.1
+diag_pin:P1.29
+driver_SGTHRS: 70 
+run_current: 1.02 # podria 1.02
+stealthchop_threshold: 0
+
+[stepper_y]
+step_pin: P0.19
+dir_pin: !P0.20
+enable_pin: !P2.8
+microsteps: 16
+rotation_distance: 40
+endstop_pin: tmc2209_stepper_y:virtual_endstop
+position_endstop: 350
+position_max: 350
+homing_speed: 20
+homing_retract_dist: 0 
+
+[tmc2209 stepper_y]
+uart_pin: P1.8
+diag_pin:P1.27
+driver_SGTHRS: 70 
+run_current: 1.02 # 0.60
+stealthchop_threshold: 0
+
+
+
+
+
+[stepper_z]
+step_pin: P0.22
+dir_pin: !P2.11
+enable_pin: !P0.21
+microsteps: 16
+rotation_distance: 4 #4?
+endstop_pin: probe:z_virtual_endstop
+
+position_max: 400
+position_min: -5
+homing_speed: 30
+
+[tmc2209 stepper_z]
+uart_pin: P1.10
+run_current: 0.600
+stealthchop_threshold: 999999
+
+[stepper_z1]
+step_pin: P2.13
+dir_pin: !P0.11
+enable_pin: !P2.12
+microsteps: 16
+rotation_distance: 4
+endstop_pin: probe:z_virtual_endstop
+
+
+[tmc2209 stepper_z1]
+uart_pin: P1.15
+run_current: 0.600
+stealthchop_threshold: 999999
+
+
+[extruder]
+step_pin: P0.1
+dir_pin: P0.0
+enable_pin: !P0.10
+microsteps: 16
+###############################
+rotation_distance: 4.63 #4.537
+full_steps_per_rotation: 200
+nozzle_diameter: 0.400
+filament_diameter: 1.750
+heater_pin: P2.7
+sensor_type: EPCOS 100K B57560G104F
+sensor_pin: P0.23
+#control: pid
+#pid_Kp: 22.2
+#pid_Ki: 1.08
+#pid_Kd: 114
+min_temp: 0
+max_temp: 260
+
+[tmc2209 extruder]
+uart_pin: P1.17
+run_current: 0.28 # 0.30
+stealthchop_threshold: 999999
+######################
+driver_TBL: 0
+driver_HEND: 7
+driver_HSTRT: 7
+driver_TOFF: 3
+
+
+[heater_bed]
+heater_pin: P2.5
+sensor_type: EPCOS 100K B57560G104F
+sensor_pin: P0.24
+control: pid
+pid_Kp: 54.027
+pid_Ki: 0.770
+pid_Kd: 948.182
+min_temp: 0
+max_temp: 130
+
+
+
+[probe]
+pin: P1.23
+x_offset: 0
+y_offset: 0
+z_offset= 0
+speed: 5
+samples: 3
+sample_retract_dist: 2
+lift_speed: 5.0
+samples_result: median
+samples_tolerance: 0.02
+samples_tolerance_retries: 5
+
+[gcode_macro RatOS]
+variable_z_probe: "static"
+
+# EVA 2 offsets:
+# 8mm:
+#   Hemera: X31.48, Y-41.69
+#   Aero: X-50.35, Y8 or X-14, Y-44.9
+#   Others: X-27.8, Y-12
+# 12mm:
+#    Hemera: X32.98, Y-43.69
+#    Aero: X-52.35, Y6.5 or X-12.5, Y-46.9
+#    Others: X-29.8, Y-13.5
+# 18mm:
+#    Hemera: X36.98, Y-46.69
+#    Aero: X-55.35, Y2.5 or X-8.5, Y-49.9
+#    Others: X-32.8, Y-17.5
+
+
+
+
+[bed_mesh]
+algorithm: lagrange #bicubic
+mesh_min: 50, 50
+mesh_max: 300, 300
+speed: 180
+probe_count: 5, 3
+mesh_pps: 2, 3
+move_check_distance: 5
+split_delta_z: .010 #.025
+fade_start: 0.2 #1
+fade_end: 10
+
+
+[z_tilt]
+z_positions:
+	320,175
+	60,175
+points:
+	320,175
+	60,175
+
+		
+speed: 50
+horizontal_move_z: 12
+retries: 10
+retry_tolerance: 0.0125
+
+
+
+
+
+[screws_tilt_adjust]
+screw1: 175,175
+screw1_name: Central screw
+screw2: 69, 54
+screw2_name: Delante izquierda
+screw3: 350, 54
+screw3_name: Delante derecha
+screw4: 350, 312
+screw4_name: Atrás derecha
+screw5: 69, 312
+screw5_name: Atrás izquierda
+horizontal_move_z: 10.
+speed: 50.
+screw_thread: CW-M3
+
+
+
+
+#[safe_z_home]
+#home_xy_position: 180, 180
+#speed: 100
+#z_hop: 10
+#z_hop_speed: 5
+
+
+
+
+
+[virtual_sdcard]
+path: ~/printer_data/gcodes
+
+[pause_resume]
+recover_velocity: 50.
+
+[display_status]
+
+[save_variables]
+filename: ~/printer_data/config/variables.cfg
+
+
+
+
+
+[mcu]
+serial: /dev/serial/by-id/usb-Klipper_lpc1768_07B0FF0FE3A448AF87193E5DC72000F5-if00
+
+[temperature_sensor raspberry_pi]
+sensor_type: temperature_host
+
+
+
+
+[printer]
+kinematics: corexy
+max_velocity: 300
+max_accel: 2500
+max_z_velocity: 10
+max_z_accel: 100
+square_corner_velocity: 5.0
+
+[board_pins]
+aliases:
+    # EXP1 header
+    EXP1_1=P1.30, EXP1_3=P1.18, EXP1_5=P1.20, EXP1_7=P1.22, EXP1_9=<GND>,
+    EXP1_2=P0.28, EXP1_4=P1.19, EXP1_6=P1.21, EXP1_8=P1.23, EXP1_10=<5V>,
+    # EXP2 header
+    EXP2_1=P0.17, EXP2_3=P3.26, EXP2_5=P3.25, EXP2_7=P1.31, EXP2_9=<GND>,
+    EXP2_2=P0.15, EXP2_4=P0.16, EXP2_6=P0.18, EXP2_8=<RST>, EXP2_10=<NC>
+    # Pins EXP2_1, EXP2_6, EXP2_2 are also MISO, MOSI, SCK of bus "ssp0"
+
+# See the sample-lcd.cfg file for definitions of common LCD displays.
+
+#*# <---------------------- SAVE_CONFIG ---------------------->
+#*# DO NOT EDIT THIS BLOCK OR BELOW. The contents are auto-generated.
+#*#
+#*# [extruder]
+#*# control = pid
+#*# pid_kp = 17.369
+#*# pid_ki = 0.799
+#*# pid_kd = 94.443
